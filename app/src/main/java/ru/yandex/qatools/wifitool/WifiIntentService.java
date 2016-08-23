@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.util.Log;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
+import javax.inject.Provider;
 
 import bolts.Continuation;
 import bolts.Task;
@@ -15,8 +17,16 @@ import bolts.Task;
  */
 public class WifiIntentService extends IntentService {
 
+    private final Injector mComponent;
+
+    @Inject
+    Provider<RetryConnector> mRetryConnectorProvider;
+
     public WifiIntentService() {
         super("WifiIntentService");
+
+        mComponent = DaggerInjector.builder().intentModule(new IntentModule(this)).build();
+        mComponent.inject(this);
     }
 
     @Override
@@ -33,7 +43,9 @@ public class WifiIntentService extends IntentService {
         ParamsValidator validator = new ParamsValidator(params);
         if (validator.isValid) {
             Log.d(Tag.NAME, "Start connection");
-            new RetryConnector(new ConnectorFactory(this), params).connect()
+
+            RetryConnector retryConnector = mRetryConnectorProvider.get();
+            retryConnector.connect(params)
                     .continueWith(reportResult())
                     .waitForCompletion();
         } else {

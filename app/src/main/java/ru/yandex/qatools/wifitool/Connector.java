@@ -4,35 +4,41 @@ import android.net.wifi.WifiManager;
 import android.util.Log;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
 
 import bolts.CancellationToken;
 import bolts.CancellationTokenSource;
 import bolts.Continuation;
 import bolts.Task;
-import ru.yandex.qatools.wifitool.utils.SystemServiceLocator;
+import ru.yandex.qatools.wifitool.utils.ConnectivityChecker;
 import ru.yandex.qatools.wifitool.utils.WifiStates;
 
 /**
  * Runs sequence of actions required for connection.
  */
 class Connector {
-    private static final int ENABLE_WIFI_DELAY = 1000;
-    private static final long CONNECTIVITY_DELAY = 5000;
+    private static final int ENABLE_WIFI_TIMEOUT = 1000;
+    private static final long CONNECTIVITY_TIMEOUT = 5000;
 
     @Nonnull
     private final WifiManager mWifiManager;
 
     @Nonnull
-    private ConnectivityChecker mConnectivityChecker;
+    private final ConnectivityMonitor mConnectivityMonitor;
 
     @Nonnull
-    private NetworkManager mNetworkManager;
+    private final NetworkManager mNetworkManager;
 
-    Connector(SystemServiceLocator serviceLocator,
-              ConnectivityChecker connectivityChecker, NetworkManager networkManager) {
-        mWifiManager = serviceLocator.getWifiManager();
-        mConnectivityChecker = connectivityChecker;
+    @Nonnull
+    private final ConnectivityChecker mConnectivityChecker;
+
+    @Inject
+    Connector(WifiManager wifiManager, ConnectivityMonitor connectivityMonitor,
+              NetworkManager networkManager, ConnectivityChecker connectivityChecker) {
+        mWifiManager = wifiManager;
+        mConnectivityMonitor = connectivityMonitor;
         mNetworkManager = networkManager;
+        mConnectivityChecker = connectivityChecker;
     }
 
     @Nonnull
@@ -47,7 +53,7 @@ class Connector {
                 return enableWifi(params)
                         .onSuccess(getNetworkId())
                         .onSuccess(connectNetwork())
-                        .onSuccessTask(mConnectivityChecker.checkNetwork(getCancellationToken()));
+                        .onSuccessTask(waitConnectivity());
             case WifiManager.WIFI_STATE_UNKNOWN:
             default:
                 throw new IllegalStateException("WiFi state unknown. Please inspect the device");
@@ -62,7 +68,7 @@ class Connector {
 
         Log.d(Tag.NAME, "Setting WiFi enabled");
         mWifiManager.setWifiEnabled(true);
-        return Task.delay(ENABLE_WIFI_DELAY).continueWith(new Continuation<Void, Params>() {
+        return Task.delay(ENABLE_WIFI_TIMEOUT).continueWith(new Continuation<Void, Params>() {
             @Override
             public Params then(Task<Void> task) {
                 int wifiState = mWifiManager.getWifiState();
@@ -116,10 +122,19 @@ class Connector {
         };
     }
 
+    private Continuation<Integer, Task<Void>> waitConnectivity() {
+        return new Continuation<Integer, Task<Void>>() {
+            @Override
+            public Task<Void> then(Task<Integer> task) throws Exception {
+                return mConnectivityMonitor.wait(task.getResult(), cancelOnTimeout());
+            }
+        };
+    }
+
     @Nonnull
-    private CancellationToken getCancellationToken() {
+    private CancellationToken cancelOnTimeout() {
         CancellationTokenSource ts = new CancellationTokenSource();
-        ts.cancelAfter(CONNECTIVITY_DELAY);
+        ts.cancelAfter(CONNECTIVITY_TIMEOUT);
         return ts.getToken();
     }
 }

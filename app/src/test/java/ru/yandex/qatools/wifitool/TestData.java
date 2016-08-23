@@ -16,7 +16,6 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
-import ru.yandex.qatools.wifitool.utils.SystemServiceLocator;
 
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -37,9 +36,6 @@ class TestData {
             new Params(SOME_SSID, NO_PASS, NO_SECURITY, NO_RETRIES, NO_DELAY);
 
     @Mock
-    SystemServiceLocator serviceLocator;
-
-    @Mock
     WifiManager wifiManager;
 
     @Mock
@@ -50,7 +46,6 @@ class TestData {
 
     TestData() {
         MockitoAnnotations.initMocks(this);
-        doReturn(wifiManager).when(serviceLocator).getWifiManager();
     }
 
     @Nonnull

@@ -10,6 +10,7 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import javax.annotation.Nonnull;
+import javax.inject.Provider;
 
 import bolts.Task;
 
@@ -25,36 +26,43 @@ import static ru.yandex.qatools.wifitool.TestData.SOME_SSID;
 @Config(manifest = Config.NONE)
 public class RetryConnectorTest {
 
+    private Provider<Connector> mConnectorProvider;
+
     @Mock
     private Connector mConnector;
 
     @Mock
     private Context mContext;
 
-    @Mock
-    private ConnectorFactory mConnectorFactory;
-
     public RetryConnectorTest() {
         MockitoAnnotations.initMocks(this);
-        doReturn(mConnector).when(mConnectorFactory).create();
+
+        // mockito fails to mock javax.inject.Provider
+        mConnectorProvider = new Provider<Connector>() {
+            @Override
+            public Connector get() {
+                return mConnector;
+            }
+        };
     }
 
     @Test
     public void zeroRetries_Connects() throws InterruptedException {
-        getRetryConnector(0).connect().waitForCompletion();
+        Params params = getRetryParams(0);
+        getRetryConnector().connect(params).waitForCompletion();
         verify(mConnector).connect(any(Params.class));
     }
 
     @Nonnull
-    private RetryConnector getRetryConnector(int retryCount) {
-        Params params = getRetryParams(retryCount);
-        return new RetryConnector(mConnectorFactory, params);
+    private RetryConnector getRetryConnector() {
+        return new RetryConnector(mConnectorProvider);
     }
 
     @Test
     public void oneRetry_OnSuccessfulConnect_Connects1Time() throws InterruptedException {
         whenConnectionSucceed();
-        getRetryConnector(1).connect().waitForCompletion();
+        Params params = getRetryParams(1);
+        getRetryConnector().connect(params).waitForCompletion();
         verify(mConnector).connect(any(Params.class));
     }
 
@@ -66,7 +74,8 @@ public class RetryConnectorTest {
     @Test
     public void oneRetry_OnFailedConnect_Connects2Times() throws InterruptedException {
         whenConnectionFail();
-        getRetryConnector(1).connect().waitForCompletion();
+        Params params = getRetryParams(1);
+        getRetryConnector().connect(params).waitForCompletion();
         verify(mConnector, times(2)).connect(any(Params.class));
     }
 

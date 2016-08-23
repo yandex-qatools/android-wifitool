@@ -8,20 +8,30 @@ import android.util.Log;
 import java.util.List;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
 
-import ru.yandex.qatools.wifitool.utils.SystemServiceLocator;
 import ru.yandex.qatools.wifitool.utils.WifiConfigurationBuilder;
 
+/**
+ * Sets up network.
+ */
 class NetworkManager {
     static final int NO_ID = -1;
 
     @Nonnull
     private final WifiManager mWifiManager;
 
-    NetworkManager(SystemServiceLocator serviceLocator) {
-        mWifiManager = serviceLocator.getWifiManager();
+    @Inject
+    NetworkManager(WifiManager wifiManager) {
+        mWifiManager = wifiManager;
     }
 
+    /**
+     * Get pre-configured wifi network or add a new one.
+     * @param params Network ssid and security parameters.
+     * @return NetworkId of a network.
+     * @throws Exception if network could not be set up.
+     */
     int getNetworkId(Params params) throws Exception {
         Log.d(Tag.NAME, "Get connected network id...");
         int connectedNetId = getConnectedNetworkWithSsid(params.quotedSsid);

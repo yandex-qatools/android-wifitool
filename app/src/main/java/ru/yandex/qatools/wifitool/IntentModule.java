@@ -1,27 +1,41 @@
-package ru.yandex.qatools.wifitool.utils;
+package ru.yandex.qatools.wifitool;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
 
 import javax.annotation.Nonnull;
+import javax.inject.Singleton;
+
+import dagger.Module;
+import dagger.Provides;
 
 import static android.content.Context.WIFI_SERVICE;
 
-public class SystemServiceLocator {
+@Module
+class IntentModule {
     @Nonnull
     private final Context mContext;
 
-    public SystemServiceLocator(Context context) {
+    IntentModule(Context context) {
         mContext = context;
     }
 
-    @Nonnull
-    public WifiManager getWifiManager() {
+    @Provides
+    @Singleton
+    Context provideContext() {
+        return mContext;
+    }
+
+    @Provides
+    @Singleton
+    WifiManager provideWifiManager() {
         return (WifiManager) mContext.getSystemService(WIFI_SERVICE);
     }
 
-    public ConnectivityManager getConnectivityManager() {
+    @Provides
+    @Singleton
+    ConnectivityManager provideConnectivityManager() {
         return (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
     }
 }

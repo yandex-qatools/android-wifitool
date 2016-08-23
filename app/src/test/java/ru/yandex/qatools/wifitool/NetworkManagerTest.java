@@ -1,11 +1,9 @@
 package ru.yandex.qatools.wifitool;
 
 import android.net.wifi.WifiConfiguration;
-import android.net.wifi.WifiManager;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
@@ -27,7 +25,7 @@ public class NetworkManagerTest {
     public NetworkManagerTest() {
         MockitoAnnotations.initMocks(this);
         mData = new TestData();
-        mNetworkManager = new NetworkManager(mData.serviceLocator);
+        mNetworkManager = new NetworkManager(mData.wifiManager);
     }
 
     @Test
