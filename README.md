@@ -8,14 +8,6 @@
 1. adb install wifitool/build/outputs/apk/wifitool-debug.apk
 
 ## Usage
-As soon as WiFi network is connected and IP is obtained, `WifiTool:Success` is logged
-
-When connection fails, `WifiTool:Fail` is logged.
-
-Possible failure reasons: WiFi can not be enabled, WiFi network can not be connected, IP can not be obtained.
-
-Usage:
-
     adb shell am broadcast
     -n ru.yandex.qatools.wifitool/.Connect
     -e ssid SSID
@@ -29,6 +21,11 @@ Examples:
     adb shell am broadcast  -n ru.yandex.qatools.wifitool/.Connect -e ssid UnsecureNet
 
 ## Output
+As soon as WiFi network is connected and IP is obtained, `WifiTool:Success` is logged
+
+When connection fails, `WifiTool:Fail` is logged.
+
+Possible failure reasons: WiFi can not be enabled, WiFi network can not be connected, IP can not be obtained.
 
 Short: look for `I/WifiTool:Success` or `I/WifiTool:Fail`
 
