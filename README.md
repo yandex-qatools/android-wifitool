@@ -5,7 +5,7 @@
 2. run "./gradlew build"
 
 ## Install
-1. adb install app-debug.apk
+1. adb install wifitool/build/outputs/apk/wifitool-debug.apk
 
 ## Usage
 As soon as WiFi network is connected and IP is obtained, `WifiTool:Success` is logged
