@@ -1,6 +1,5 @@
 package ru.yandex.qatools.wifitool;
 
-import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 
@@ -32,9 +31,6 @@ public class ConnectivityMonitorTest {
     private final ConnectivityMonitor mConnectivityMonitor;
 
     @Mock
-    private Context mContext;
-
-    @Mock
     private ConnectivityChecker mConnectivityChecker;
 
     @Mock
@@ -42,7 +38,8 @@ public class ConnectivityMonitorTest {
 
     public ConnectivityMonitorTest() {
         MockitoAnnotations.initMocks(this);
-        mConnectivityMonitor = new ConnectivityMonitor(mContext, mConnectivityChecker);
+        mConnectivityMonitor = new ConnectivityMonitor(RuntimeEnvironment.application,
+                mConnectivityChecker);
     }
 
     @Test
