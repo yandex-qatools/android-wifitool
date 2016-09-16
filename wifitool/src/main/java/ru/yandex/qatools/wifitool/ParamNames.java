@@ -6,7 +6,7 @@ package ru.yandex.qatools.wifitool;
 class ParamNames {
     static final String SSID = "ssid";
     static final String PASS = "pass";
-    static final String SECURITY = "securityString";
+    static final String SECURITY = "security";
     static final String RETRY_COUNT = "retry_count";
     static final String RETRY_DELAY = "retry_delay";
 

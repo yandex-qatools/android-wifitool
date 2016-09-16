@@ -4,6 +4,9 @@
 1. clone current repository to your local computer
 2. run "./gradlew build"
 
+There is a prebuilt binary available:
+https://github.com/yandex-qatools/android-wifitool/releases
+
 ## Install
 1. adb install wifitool/build/outputs/apk/wifitool-debug.apk
 
@@ -11,13 +14,13 @@
     adb shell am broadcast
     -n ru.yandex.qatools.wifitool/.Connect
     -e ssid SSID
-    -e securityString [WEP|WPA]
+    -e security [WEP|WPA]
     -e pass password
     -e retry_count number of connection retries. Default is 0
     -e retry_delay retry delay in milliseconds. Default is 10000
 Examples:
 
-    adb shell am broadcast  -n ru.yandex.qatools.wifitool/.Connect -e ssid SecureNet -e securityString WPA -e pass 123456 -e retry_count 3 -e retry_delay 5
+    adb shell am broadcast  -n ru.yandex.qatools.wifitool/.Connect -e ssid SecureNet -e security WPA -e pass 123456 -e retry_count 3 -e retry_delay 5
     adb shell am broadcast  -n ru.yandex.qatools.wifitool/.Connect -e ssid UnsecureNet
 
 ## Output
