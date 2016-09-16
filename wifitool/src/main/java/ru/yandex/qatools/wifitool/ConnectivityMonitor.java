@@ -15,10 +15,11 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import bolts.CancellationToken;
-import bolts.Continuation;
 import bolts.Task;
 import bolts.TaskCompletionSource;
 import ru.yandex.qatools.wifitool.utils.ConnectivityChecker;
+
+import static junit.framework.Assert.assertNotNull;
 
 /**
  * Waits for network to get connected.
@@ -60,24 +61,18 @@ class ConnectivityMonitor {
         }
 
         register(netId);
-        timeoutToken.register(new Runnable() {
-            @Override
-            public void run() {
-                if (mCompletion.getTask().isCompleted()) {
-                    return;
-                }
-                Log.d(Tag.NAME, "Connectivity check timed out");
-                mCompletion.setError(new Exception("Connectivity check timed out"));
+        timeoutToken.register(() -> {
+            if (mCompletion.getTask().isCompleted()) {
+                return;
             }
+            Log.d(Tag.NAME, "Connectivity check timed out");
+            mCompletion.setError(new Exception("Connectivity check timed out"));
         });
 
         return mCompletion.getTask().continueWithTask(
-                new Continuation<Void, Task<Void>>() {
-                    @Override
-                    public Task<Void> then(Task<Void> task) throws Exception {
-                        unregister();
-                        return task;
-                    }
+                task -> {
+                    unregister();
+                    return task;
                 }
         );
     }
@@ -98,7 +93,7 @@ class ConnectivityMonitor {
 
     private synchronized void unregister() {
         Log.d(Tag.NAME, "Unregister network status receiver");
-        Assert.assertNotNull("Receiver must be registered before unregister",
+        assertNotNull("Receiver must be registered before unregister",
                 mBroadcastReceiver);
         mContext.unregisterReceiver(mBroadcastReceiver);
     }

@@ -9,7 +9,6 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import bolts.Continuation;
-import bolts.Task;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -17,16 +16,14 @@ import bolts.Task;
  */
 public class WifiIntentService extends IntentService {
 
-    private final Injector mComponent;
-
     @Inject
     Provider<RetryConnector> mRetryConnectorProvider;
 
     public WifiIntentService() {
         super("WifiIntentService");
 
-        mComponent = DaggerInjector.builder().intentModule(new IntentModule(this)).build();
-        mComponent.inject(this);
+        Injector component = DaggerInjector.builder().intentModule(new IntentModule(this)).build();
+        component.inject(this);
     }
 
     @Override
@@ -35,6 +32,7 @@ public class WifiIntentService extends IntentService {
             handle(intent);
         } catch (InterruptedException e) {
             Log.e(Tag.FAIL, "Process got interrupted", e);
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -56,16 +54,13 @@ public class WifiIntentService extends IntentService {
 
     @Nonnull
     private Continuation<Void, Void> reportResult() {
-        return new Continuation<Void, Void>() {
-            @Override
-            public Void then(Task task) {
-                if (task.isFaulted()) {
-                    Log.i(Tag.FAIL, task.getError().getMessage());
-                } else {
-                    Log.i(Tag.SUCCESS, "Connected");
-                }
-                return null;
+        return task -> {
+            if (task.isFaulted()) {
+                Log.i(Tag.FAIL, task.getError().getMessage());
+            } else {
+                Log.i(Tag.SUCCESS, "Connected");
             }
+            return null;
         };
     }
 

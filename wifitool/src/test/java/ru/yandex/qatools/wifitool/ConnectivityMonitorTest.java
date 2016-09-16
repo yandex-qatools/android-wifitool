@@ -47,7 +47,6 @@ public class ConnectivityMonitorTest {
         whenConnected();
 
         Task<Void> waitTask = mConnectivityMonitor.wait(TestData.NET_ID, mCancellationToken);
-        waitTask.waitForCompletion();
 
         assertSucceeds(waitTask);
     }
@@ -71,8 +70,6 @@ public class ConnectivityMonitorTest {
 
         whenConnected();
         sendBroadcast();
-
-        waitTask.waitForCompletion();
 
         assertSucceeds(waitTask);
     }

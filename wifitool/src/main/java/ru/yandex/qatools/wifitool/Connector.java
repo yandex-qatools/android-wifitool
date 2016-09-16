@@ -68,17 +68,14 @@ class Connector {
 
         Log.d(Tag.NAME, "Setting WiFi enabled");
         mWifiManager.setWifiEnabled(true);
-        return Task.delay(ENABLE_WIFI_TIMEOUT).continueWith(new Continuation<Void, Params>() {
-            @Override
-            public Params then(Task<Void> task) {
-                int wifiState = mWifiManager.getWifiState();
-                Log.d(Tag.NAME, WifiStates.getName(wifiState));
-                if (wifiState == WifiManager.WIFI_STATE_ENABLED) {
-                    return params;
-                }
-                throw new IllegalStateException("WiFi could not be enabled. Now " +
-                        WifiStates.getName(wifiState));
+        return Task.delay(ENABLE_WIFI_TIMEOUT).continueWith(task -> {
+            int wifiState = mWifiManager.getWifiState();
+            Log.d(Tag.NAME, WifiStates.getName(wifiState));
+            if (wifiState == WifiManager.WIFI_STATE_ENABLED) {
+                return params;
             }
+            throw new IllegalStateException("WiFi could not be enabled. Now " +
+                    WifiStates.getName(wifiState));
         });
     }
 
@@ -89,46 +86,33 @@ class Connector {
      */
     @Nonnull
     private Continuation<Params, Integer> getNetworkId() {
-        return new Continuation<Params, Integer>() {
-            @Override
-            public Integer then(Task<Params> task) throws Exception {
-                return mNetworkManager.getNetworkId(task.getResult());
-            }
-        };
+        return task -> mNetworkManager.getNetworkId(task.getResult());
     }
 
     @Nonnull
     private Continuation<Integer, Integer> connectNetwork() {
-        return new Continuation<Integer, Integer>() {
-            @Override
-            public Integer then(Task<Integer> task) throws Exception {
-                Integer netId = task.getResult();
+        return task -> {
+            Integer netId = task.getResult();
 
-                if (mConnectivityChecker.isWifiNetworkConnected(netId)) {
-                    return netId;
-                }
-
-                if (!mWifiManager.disconnect()) {
-                    throw new Exception("Could not disconnect WiFi");
-                }
-                if (!mWifiManager.enableNetwork(netId, true)) {
-                    throw new Exception("Could not enable a configured network");
-                }
-                if (!mWifiManager.reconnect()) {
-                    throw new Exception("Could not connect to a configured network");
-                }
+            if (mConnectivityChecker.isWifiNetworkConnected(netId)) {
                 return netId;
             }
+
+            if (!mWifiManager.disconnect()) {
+                throw new Exception("Could not disconnect WiFi");
+            }
+            if (!mWifiManager.enableNetwork(netId, true)) {
+                throw new Exception("Could not enable a configured network");
+            }
+            if (!mWifiManager.reconnect()) {
+                throw new Exception("Could not connect to a configured network");
+            }
+            return netId;
         };
     }
 
     private Continuation<Integer, Task<Void>> waitConnectivity() {
-        return new Continuation<Integer, Task<Void>>() {
-            @Override
-            public Task<Void> then(Task<Integer> task) throws Exception {
-                return mConnectivityMonitor.wait(task.getResult(), cancelOnTimeout());
-            }
-        };
+        return task -> mConnectivityMonitor.wait(task.getResult(), cancelOnTimeout());
     }
 
     @Nonnull
