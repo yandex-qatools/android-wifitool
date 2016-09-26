@@ -12,4 +12,7 @@ class ParamNames {
 
     static final String SECURITY_WEP = "WEP";
     static final String SECURITY_WPA = "WPA";
+
+    private ParamNames() {
+    }
 }

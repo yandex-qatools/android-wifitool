@@ -6,11 +6,11 @@ import android.util.Log;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
-import bolts.CancellationToken;
 import bolts.CancellationTokenSource;
 import bolts.Continuation;
 import bolts.Task;
 import ru.yandex.qatools.wifitool.utils.ConnectivityChecker;
+import ru.yandex.qatools.wifitool.utils.WifiManagerException;
 import ru.yandex.qatools.wifitool.utils.WifiStates;
 
 /**
@@ -99,26 +99,24 @@ class Connector {
             }
 
             if (!mWifiManager.disconnect()) {
-                throw new Exception("Could not disconnect WiFi");
+                throw new WifiManagerException("Could not disconnect WiFi");
             }
             if (!mWifiManager.enableNetwork(netId, true)) {
-                throw new Exception("Could not enable a configured network");
+                throw new WifiManagerException("Could not enable a configured network");
             }
             if (!mWifiManager.reconnect()) {
-                throw new Exception("Could not connect to a configured network");
+                throw new WifiManagerException("Could not connect to a configured network");
             }
             return netId;
         };
     }
 
     private Continuation<Integer, Task<Void>> waitConnectivity() {
-        return task -> mConnectivityMonitor.wait(task.getResult(), cancelOnTimeout());
+        return task -> {
+            CancellationTokenSource ts = new CancellationTokenSource();
+            ts.cancelAfter(CONNECTIVITY_TIMEOUT);
+            return mConnectivityMonitor.wait(task.getResult(), ts.getToken());
+        };
     }
 
-    @Nonnull
-    private CancellationToken cancelOnTimeout() {
-        CancellationTokenSource ts = new CancellationTokenSource();
-        ts.cancelAfter(CONNECTIVITY_TIMEOUT);
-        return ts.getToken();
-    }
 }
