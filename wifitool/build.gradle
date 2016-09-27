@@ -13,7 +13,7 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
     compileSdkVersion 24
-    buildToolsVersion "24.0.1"
+    buildToolsVersion "24.0.3"
 
     def versionMajor = 1
     def versionMinor = 0
@@ -41,13 +41,19 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:24.1.1'
     compile 'com.google.code.findbugs:jsr305:2.0.1'
     compile 'com.parse.bolts:bolts-tasks:1.4.0'
     testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-all:2.0.2-beta'
+    testCompile 'org.mockito:mockito-core:2.1.0'
     testCompile 'org.robolectric:robolectric:3.1.2'
 
     apt 'com.google.dagger:dagger-compiler:2.6'
     compile 'com.google.dagger:dagger:2.6'
+}
+
+sonarqube {
+    properties {
+        property 'sonar.junit.reportsPath', 'build/test-results/debug'
+        property 'sonar.jacoco.reportPath', ''
+    }
 }
