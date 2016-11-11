@@ -86,7 +86,7 @@ class Connector {
      */
     @Nonnull
     private Continuation<Params, Integer> getNetworkId() {
-        return task -> mNetworkManager.getNetworkId(task.getResult());
+        return task -> mNetworkManager.createNetwork(task.getResult());
     }
 
     @Nonnull

@@ -14,7 +14,6 @@ import org.robolectric.annotation.Config;
 import javax.annotation.Nonnull;
 
 import bolts.CancellationToken;
-import bolts.Continuation;
 import bolts.Task;
 import ru.yandex.qatools.wifitool.utils.ConnectivityChecker;
 
@@ -63,7 +62,7 @@ public class ConnectorTest {
         doReturn(WifiManager.WIFI_STATE_ENABLED).when(mData.wifiManager).getWifiState();
 
         doReturn(true).when(mConnectivityChecker).isWifiNetworkConnected(NET_ID);
-        doReturn(NET_ID).when(mNetworkManager).getNetworkId(any(Params.class));
+        doReturn(NET_ID).when(mNetworkManager).createNetwork(any(Params.class));
         doReturn(Task.forResult(null)).when(mConnectivityMonitor)
                 .wait(anyInt(), any(CancellationToken.class));
 

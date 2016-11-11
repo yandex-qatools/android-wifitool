@@ -32,7 +32,7 @@ class NetworkManager {
      * @return NetworkId of a network.
      * @throws Exception if network could not be set up.
      */
-    int getNetworkId(Params params) throws Exception {
+    int createNetwork(Params params) throws Exception {
         Log.d(Tag.NAME, "Get connected network id...");
         int connectedNetId = getConnectedNetworkWithSsid(params.quotedSsid);
         if (connectedNetId != NO_ID) {
@@ -43,20 +43,16 @@ class NetworkManager {
         int netId = getConfiguredNetworkId(params);
         if (netId == NO_ID) {
             Log.d(Tag.NAME, "Configured network not found");
-            return addNetwork(params);
-        }
-
-        Log.d(Tag.NAME, "Configured network found. It is not connected");
-        if (updateNetworkConfiguration(params, netId)) {
-            Log.d(Tag.NAME, "Network configuration updated");
-            return netId;
         } else {
-            Log.d(Tag.NAME, "Network configuration update failed. Removing configured network");
-            if (mWifiManager.removeNetwork(netId)) {
-                return addNetwork(params);
+            // updated network configuration are not able to connect on some devices.
+            // removing network and adding it again is quite fast and is durable enough
+            Log.d(Tag.NAME, "Configured network found. It is not connected");
+            Log.d(Tag.NAME, "Removing configured network");
+            if (!mWifiManager.removeNetwork(netId)) {
+                throw new IllegalStateException("Unable to remove existing network");
             }
-            throw new IllegalStateException("Unable to remove existing network");
         }
+        return addNetwork(params);
     }
 
     private int getConnectedNetworkWithSsid(String maskedSsid) {
@@ -79,7 +75,7 @@ class NetworkManager {
     }
 
     private int addNetwork(Params params) {
-        Log.d(Tag.NAME, "Add network");
+        Log.d(Tag.NAME, "Adding network");
 
         WifiConfiguration wfc = WifiConfigurationBuilder.create(params);
         int result = mWifiManager.addNetwork(wfc);
@@ -89,12 +85,4 @@ class NetworkManager {
         Log.d(Tag.NAME, "Network added");
         return result;
     }
-
-    private boolean updateNetworkConfiguration(Params params, int netId) {
-        Log.d(Tag.NAME, "Updating network configuration");
-        WifiConfiguration config = WifiConfigurationBuilder.create(params);
-        config.networkId = netId;
-        return mWifiManager.updateNetwork(config) != NO_ID;
-    }
-
 }

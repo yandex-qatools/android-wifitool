@@ -32,10 +32,12 @@ class TestData {
     private static final int NO_RETRIES = 0;
     private static final int NO_DELAY = 0;
 
+    @Nonnull
     static final Params UNSECURE_PARAMS =
             new Params(SOME_SSID, NO_PASS, NO_SECURITY, NO_RETRIES, NO_DELAY);
 
     @Mock
+    @Nonnull
     WifiManager wifiManager;
 
     @Mock

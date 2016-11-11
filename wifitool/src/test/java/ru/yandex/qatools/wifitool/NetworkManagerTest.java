@@ -8,6 +8,8 @@ import org.mockito.MockitoAnnotations;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+import javax.annotation.Nonnull;
+
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
@@ -18,8 +20,9 @@ import static ru.yandex.qatools.wifitool.TestData.UNSECURE_PARAMS;
 @RunWith(RobolectricTestRunner.class)
 @Config(manifest = Config.NONE)
 public class NetworkManagerTest {
+    @Nonnull
     private final TestData mData;
-
+    @Nonnull
     private NetworkManager mNetworkManager;
 
     public NetworkManagerTest() {
@@ -32,37 +35,49 @@ public class NetworkManagerTest {
     public void networkIsConfiguredAndConnected_ReturnsId() throws Exception {
         mData.whenNetworkIsConnected();
 
-        assertEquals(NET_ID, mNetworkManager.getNetworkId(UNSECURE_PARAMS));
+        assertEquals(NET_ID, mNetworkManager.createNetwork(UNSECURE_PARAMS));
     }
 
     @Test
-    public void networkIsConfiguredAndNotConnected_CanUpdate_ReturnsId() throws Exception {
+    public void networkIsConfiguredAndNotConnected_CanBeRemoved_ReturnsId() throws Exception {
         mData.whenNetworkIsConfigured();
-        doReturn(NET_ID).when(mData.wifiManager).updateNetwork(any(WifiConfiguration.class));
+        whenNetworkCanBeRemoved();
+        whenNetworkCanBeAdded();
 
-        assertEquals(NET_ID, mNetworkManager.getNetworkId(UNSECURE_PARAMS));
+        assertEquals(NET_ID, mNetworkManager.createNetwork(UNSECURE_PARAMS));
     }
 
     @Test(expected = Exception.class)
     public void networkIsConfiguredAndNotConnected_CantUpdate_Throws() throws Exception {
         mData.whenNetworkIsConfigured();
-        doReturn(NO_ID).when(mData.wifiManager).updateNetwork(any(WifiConfiguration.class));
 
-        assertEquals(NET_ID, mNetworkManager.getNetworkId(UNSECURE_PARAMS));
+        assertEquals(NET_ID, mNetworkManager.createNetwork(UNSECURE_PARAMS));
     }
 
     @Test
     public void networkIsNotConfigured_CanAdd_ReturnsId() throws Exception {
-        doReturn(NET_ID).when(mData.wifiManager).addNetwork(any(WifiConfiguration.class));
+        whenNetworkCanBeAdded();
 
-        assertEquals(NET_ID, mNetworkManager.getNetworkId(UNSECURE_PARAMS));
+        assertEquals(NET_ID, mNetworkManager.createNetwork(UNSECURE_PARAMS));
     }
 
     @Test(expected = Exception.class)
     public void networkIsNotConfigured_CantAdd_Throws() throws Exception {
-        doReturn(NO_ID).when(mData.wifiManager).addNetwork(any(WifiConfiguration.class));
+        whenNetworkCanNotBeAdded();
 
-        mNetworkManager.getNetworkId(UNSECURE_PARAMS);
+        mNetworkManager.createNetwork(UNSECURE_PARAMS);
+    }
+
+    private void whenNetworkCanBeRemoved() {
+        doReturn(true).when(mData.wifiManager).removeNetwork(NET_ID);
+    }
+
+    private void whenNetworkCanBeAdded() {
+        doReturn(NET_ID).when(mData.wifiManager).addNetwork(any(WifiConfiguration.class));
+    }
+
+    private void whenNetworkCanNotBeAdded() {
+        doReturn(NO_ID).when(mData.wifiManager).addNetwork(any(WifiConfiguration.class));
     }
 
 }
