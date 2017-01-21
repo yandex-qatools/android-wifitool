@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'android-apt'
+apply plugin: 'jacoco'
 apply plugin: 'me.tatarka.retrolambda'
 
 def gitVersion() {
@@ -12,8 +13,8 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-    compileSdkVersion 24
-    buildToolsVersion "24.0.3"
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
 
     def versionMajor = 1
     def versionMinor = 0
@@ -22,7 +23,7 @@ android {
     defaultConfig {
         applicationId "ru.yandex.qatools.wifitool"
         minSdkVersion 16
-        targetSdkVersion 24
+        targetSdkVersion 25
         versionCode gitVersion()
         versionName "${versionMajor}.${versionMinor}.${versionPatch}"
     }
@@ -32,6 +33,16 @@ android {
         }
         debug {
             testCoverageEnabled true
+        }
+    }
+    testOptions {
+        unitTests {
+            all {
+                // for correct robolectric test coverage
+                jacoco {
+                    includeNoLocationClasses = true
+                }
+            }
         }
     }
 }
@@ -45,15 +56,18 @@ dependencies {
     compile 'com.parse.bolts:bolts-tasks:1.4.0'
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.1.0'
-    testCompile 'org.robolectric:robolectric:3.1.2'
+    testCompile 'org.robolectric:robolectric:3.2.1'
 
     apt 'com.google.dagger:dagger-compiler:2.6'
     compile 'com.google.dagger:dagger:2.6'
 }
 
+def sonarVariant = 'debug'
 sonarqube {
+    androidVariant = sonarVariant
     properties {
-        property 'sonar.junit.reportsPath', 'build/test-results/debug'
-        property 'sonar.jacoco.reportPath', ''
+        property 'sonar.junit.reportsPath', "build/test-results/${sonarVariant}"
+        property 'sonar.jacoco.reportPaths', "build/jacoco/test${sonarVariant.capitalize()}UnitTest.exec"
+        property 'sonar.android.lint.report', "build/outputs/lint-results-${sonarVariant}.xml"
     }
 }
