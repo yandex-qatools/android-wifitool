@@ -3,11 +3,19 @@ jdk: oraclejdk8
 sudo: false
 android:
   components:
-    - platform-tools
-    - tools
-    - build-tools-25.0.2
-    - android-25
+  - platform-tools
+  - tools
+  - build-tools-25.0.2
+  - android-25
 script: "./gradlew build sonarqube"
 env:
   global:
     secure: Z3sf5lRvRupLj1pBMR30pwgQJWr2hVQO9zlFBfdqysPpL+oMDfXuP5WLUt94Bx9dte9lvRzV8T+zqvwY00RS94a4t7abPzk7f7yN0nuTaMb+Rnb1dvbFHUdmp2xk4R14jTSQAyEjzVlxDCtN/oK8MsFqoDdX/3seezdGRz0mMYVGWxWb7bA4Nzi79fmvgFlSiNsR146TNbPnq5gcknhJTHxpFC4Hl3ondofmZY4eAJl1ca6IhQ4uZbtsPAFHlFtTUtcDREsktb9V4ozGANesbWaK7wNTiqSgNOGptBw60jpEmj26aiWUTPI/l1pT06oMgHLx58k1xlNQ4MfTchDHfvGTBNxp399En80wB5ab1LLRgoT3eKcZ2M1TJ0U7iadgeyT6QbzNAFql8hdq9lBwQud1B5hy3WLGyEWWoYqITFQocT9epjCKdXWBx0mKSvRquaKDxMZqag0AVaODr/HI1St9H1BdFpQTHlQMdArU7fIRu05KkM7dNipJfqWcWKovsPA81gXB2vosw5eG9gn+M6hVtB5NUgCTqt0ElnK8FH8ip6iC5IoP/Y2trVrKrwsVf56WxTmypLQHJJszk6zdJwhmwTEEH+AIkMjBS+I3mQUsChg1iYkxKNtbB5kFf9uwE3RlHtgEeqYaI6iE69LkFi+djc2BSuLkHuI6JDuzR1k=
+deploy:
+  provider: releases
+  api_key:
+    secure: Jna3/cuI8KJjR2Jij7ntaUer5WP+T/UkWnRv5BeqcDQwPqGjyv5u5BosjoIjrNnuKSkrRVz8CcDAvMpLmDqT6sVTYpkUJuWv7v4eJN81RoP71tVDUj/F3OF6hqqYxd3oKZi6JEQ6yPo4xIksVOiqLmptrlJSofAiWBqrHOa65UWOHGzUoQ63bXJS1hRzgcAPGX+kKnbuWvIDKduS3E93NWujywU3LSCCNOtSNgtEOhSsRJwK8yV2xDh9hwifcAAt7EOf6Ne+gYzOkdiDep2WEiko6/3vVFdhZFPS6pLORrFqGEkVXXSNWuYp+MhKHnixLRLk5y+LJQKkGdyEnjgLGf0HZz7pqPSiHZZgmKzT9yFTaMj4uAD8g3zpdMV75DPmpCjd2ATXLgZehNrkgp+AzQe5WOeZ9epnvdqWNacTLDSYCtXNC+T1BE6CgInP4+s+kQa0n5PoaDJuxukjka+2YNqRhfeXS1lGrBt86us+FLPg9V1Icbj28eKZUOYxY4g4pwTlMVK+anXPeEWfo+I4epq12usB99gxmTJcbhq+4qb4qIDLfhnG7Dwm6OeFMwWvFwuR2S7dqNNIfCLqhd+6VOm38mrGWDMm4BPVS/hefv9CwBvYu9gWvuFVS7qhruPC8ucCk1C9PusOHGjLROPwtfgGB3QpNCxChm9934mQyqU=
+  file: wifitool/build/outputs/apk/wifitool-release-unsigned.apk
+  skip_cleanup: true
+  on:
+    repo: yandex-qatools/android-wifitool
