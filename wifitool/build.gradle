@@ -3,11 +3,6 @@ apply plugin: 'android-apt'
 apply plugin: 'jacoco'
 apply plugin: 'me.tatarka.retrolambda'
 
-def gitVersion() {
-    def process = "git rev-list master --first-parent --count".execute()
-    return process.text.toInteger()
-}
-
 android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -16,20 +11,16 @@ android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
 
-    def versionMajor = 1
-    def versionMinor = 0
-    def versionPatch = 1
-
     defaultConfig {
         applicationId "ru.yandex.qatools.wifitool"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode gitVersion()
-        versionName "${versionMajor}.${versionMinor}.${versionPatch}"
+        versionCode System.env.TRAVIS_BUILD_NUMBER as Integer
+        versionName "1.0.1"
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
         }
         debug {
             testCoverageEnabled true
@@ -45,17 +36,17 @@ android {
             }
         }
     }
+    lintOptions {
+        abortOnError false
+    }
 }
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
     compile 'com.google.code.findbugs:jsr305:2.0.1'
     compile 'com.parse.bolts:bolts-tasks:1.4.0'
     testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:2.1.0'
+    testCompile 'org.mockito:mockito-core:2.6.4'
     testCompile 'org.robolectric:robolectric:3.2.1'
 
     apt 'com.google.dagger:dagger-compiler:2.6'

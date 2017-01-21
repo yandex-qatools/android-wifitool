@@ -1,10 +1,13 @@
 language: android
 jdk: oraclejdk8
 sudo: false
-
 android:
   components:
-    - build-tools-24.0.3
-licenses:
-    - 'android-sdk-license-.+'
-script: ./gradlew test
+    - platform-tools
+    - tools
+    - build-tools-25.0.2
+    - android-25
+script: "./gradlew build sonarqube"
+env:
+  global:
+    secure: Z3sf5lRvRupLj1pBMR30pwgQJWr2hVQO9zlFBfdqysPpL+oMDfXuP5WLUt94Bx9dte9lvRzV8T+zqvwY00RS94a4t7abPzk7f7yN0nuTaMb+Rnb1dvbFHUdmp2xk4R14jTSQAyEjzVlxDCtN/oK8MsFqoDdX/3seezdGRz0mMYVGWxWb7bA4Nzi79fmvgFlSiNsR146TNbPnq5gcknhJTHxpFC4Hl3ondofmZY4eAJl1ca6IhQ4uZbtsPAFHlFtTUtcDREsktb9V4ozGANesbWaK7wNTiqSgNOGptBw60jpEmj26aiWUTPI/l1pT06oMgHLx58k1xlNQ4MfTchDHfvGTBNxp399En80wB5ab1LLRgoT3eKcZ2M1TJ0U7iadgeyT6QbzNAFql8hdq9lBwQud1B5hy3WLGyEWWoYqITFQocT9epjCKdXWBx0mKSvRquaKDxMZqag0AVaODr/HI1St9H1BdFpQTHlQMdArU7fIRu05KkM7dNipJfqWcWKovsPA81gXB2vosw5eG9gn+M6hVtB5NUgCTqt0ElnK8FH8ip6iC5IoP/Y2trVrKrwsVf56WxTmypLQHJJszk6zdJwhmwTEEH+AIkMjBS+I3mQUsChg1iYkxKNtbB5kFf9uwE3RlHtgEeqYaI6iE69LkFi+djc2BSuLkHuI6JDuzR1k=

@@ -29,7 +29,7 @@ task clean(type: Delete) {
 sonarqube {
     properties {
         property 'sonar.host.url', project.property('sonar.host.url')
-        property 'sonar.login', project.property('sonar.login')
+        property 'sonar.login', System.env.SONAR_LOGIN
     }
 }
 
