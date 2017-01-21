@@ -1,5 +1,8 @@
 # Enable WiFi and connect to WiFi network from adb
 
+[![Travis](https://img.shields.io/travis/yandex-qatools/android-wifitool.svg)](https://travis-ci.org/yandex-qatools/android-wifitool)
+[![SonarQube Coverage](https://img.shields.io/sonar/https/sonarqube.com/android-wifitool/coverage.svg)](https://sonarqube.com/dashboard?id=android-wifitool)
+
 ## Build
 1. clone current repository to your local computer
 2. run "./gradlew build"
